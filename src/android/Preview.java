@@ -64,6 +64,10 @@ class Preview extends RelativeLayout implements SurfaceHolder.Callback {
         params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
       }
       mCamera.setParameters(params);
+    } else {
+      mCamera = camera;
+      this.cameraId = cameraId;
+      mSupportedPreviewSizes = null;
     }
   }
 
