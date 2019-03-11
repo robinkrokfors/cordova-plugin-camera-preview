@@ -315,8 +315,8 @@ public class CameraActivity extends Fragment {
     // Because the Camera object is a shared resource, it's very important to release it when the activity is paused.
     if (mCamera != null) {
       setDefaultCameraId();
+      mCamera.stopPreview();
       mPreview.setCamera(null, -1);
-      mCamera.setPreviewCallback(null);
       mCamera.release();
       mCamera = null;
     }
@@ -351,25 +351,6 @@ public class CameraActivity extends Fragment {
 
       // Acquire the next camera and request Preview to reconfigure parameters.
       mCamera = Camera.open(cameraCurrentlyLocked);
-
-      if (cameraParameters != null) {
-        Log.d(TAG, "camera parameter not null");
-
-        // Check for flashMode as well to prevent error on frontward facing camera.
-        List<String> supportedFlashModesNewCamera = mCamera.getParameters().getSupportedFlashModes();
-        String currentFlashModePreviousCamera = cameraParameters.getFlashMode();
-        if (supportedFlashModesNewCamera != null && supportedFlashModesNewCamera.contains(currentFlashModePreviousCamera)) {
-          Log.d(TAG, "current flash mode supported on new camera. setting params");
-         /* mCamera.setParameters(cameraParameters);
-            The line above is disabled because parameters that can actually be changed are different from one device to another. Makes less sense trying to reconfigure them when changing camera device while those settings gan be changed using plugin methods.
-         */
-        } else {
-          Log.d(TAG, "current flash mode NOT supported on new camera");
-        }
-
-      } else {
-        Log.d(TAG, "camera parameter NULL");
-      }
 
       mPreview.switchCamera(mCamera, cameraCurrentlyLocked);
 
@@ -471,7 +452,9 @@ public class CameraActivity extends Fragment {
         Log.d(TAG, "CameraPreview onPictureTaken general exception");
       } finally {
         canTakePicture = true;
-        mCamera.startPreview();
+
+        if(mCamera != null)
+          mCamera.startPreview();
       }
     }
   };
